@@ -8,12 +8,15 @@ WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720 
 VIRTUAL_WIDTH = 432
 VIRTUAL_HEIGHT = 243
-FONT_SIZE = 8
+FONT_SIZE_SMALL = 8
+FONT_SIZE_BIG = 32
 BALL_SIZE = 4
 PADDLE_WIDTH = 5
 PADDLE_HEIGHT = 20
 PADDLE_MARGIN_X = 10
 PADDLE_MARGIN_Y = 30
+PADDLE_SPEED = 200
+SCORE_MARGIN = 30
 
 -- Runs when the game first starts up, only once; used to initialize the game
 function love.load()
@@ -22,8 +25,8 @@ function love.load()
   love.graphics.setDefaultFilter('nearest', 'nearest')
   
   -- use retro looking font
-  smallFont = love.graphics.newFont('assets/font.ttf', FONT_SIZE)
-  love.graphics.setFont(smallFont)
+  smallFont = love.graphics.newFont('assets/font.ttf', FONT_SIZE_SMALL)
+  bigFont = love.graphics.newFont('assets/font.ttf', FONT_SIZE_BIG)
   
   -- initialize virtual resolution, which will be rendered within the actual window no matter its
   -- dimensions; wraps the love.window.setMode call
@@ -32,12 +35,35 @@ function love.load()
     resizable = false,
     vsync = true
   })
+
+  -- initialize scores and paddle positions
+  player1Score = 0
+  player2Score = 0
+  player1Y = PADDLE_MARGIN_Y
+  player2Y = VIRTUAL_HEIGHT - PADDLE_HEIGHT - PADDLE_MARGIN_Y
 end
 
 -- Keyboard handling, called by LOVE2D for each frame
 function love.keypressed(key)
   if key == 'escape' then
     love.event.quit()
+  end
+end
+
+-- Runs every frame
+function love.update(dt)
+  -- player 1 movement (scaled by delta time)
+  if love.keyboard.isDown('w') then
+    player1Y = player1Y + -PADDLE_SPEED * dt
+  elseif love.keyboard.isDown('s') then
+    player1Y = player1Y + PADDLE_SPEED * dt
+  end
+
+  -- player 2 movement (scaled by delta time)
+  if love.keyboard.isDown('up') then
+    player2Y = player2Y + -PADDLE_SPEED * dt
+  elseif love.keyboard.isDown('down') then
+    player2Y = player2Y + PADDLE_SPEED * dt
   end
 end
 
@@ -49,11 +75,15 @@ function love.draw()
   -- clear screen with a RGBA color
   love.graphics.clear(40/255, 45/255, 52/255, 1)
   
+  love.graphics.setFont(smallFont)
   love.graphics.printf('Hello Pong!',  0, 20, VIRTUAL_WIDTH, 'center')
   
-  -- the paddles and the ball will be represented by simple rectangles
-  love.graphics.rectangle('fill', PADDLE_MARGIN_X, PADDLE_MARGIN_Y, PADDLE_WIDTH, PADDLE_HEIGHT)
-  love.graphics.rectangle('fill', VIRTUAL_WIDTH - PADDLE_MARGIN_X, VIRTUAL_HEIGHT - PADDLE_HEIGHT - PADDLE_MARGIN_Y, PADDLE_WIDTH, PADDLE_HEIGHT)
+  -- draw the scores, paddles and ball
+  love.graphics.setFont(bigFont)
+  love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - FONT_SIZE_BIG / 2 - SCORE_MARGIN, VIRTUAL_HEIGHT / 3)
+  love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + SCORE_MARGIN, VIRTUAL_HEIGHT / 3)
+  love.graphics.rectangle('fill', PADDLE_MARGIN_X, player1Y, PADDLE_WIDTH, PADDLE_HEIGHT)
+  love.graphics.rectangle('fill', VIRTUAL_WIDTH - PADDLE_MARGIN_X, player2Y, PADDLE_WIDTH, PADDLE_HEIGHT)
   love.graphics.rectangle('fill', VIRTUAL_WIDTH / 2 - BALL_SIZE / 2, VIRTUAL_HEIGHT / 2 - BALL_SIZE / 2, BALL_SIZE, BALL_SIZE)
   
   -- end rendering at virtual resolution
