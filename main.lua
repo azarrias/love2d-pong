@@ -8,13 +8,23 @@ WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720 
 VIRTUAL_WIDTH = 432
 VIRTUAL_HEIGHT = 243
-FONT_SIZE = 12
+FONT_SIZE = 8
+BALL_SIZE = 4
+PADDLE_WIDTH = 5
+PADDLE_HEIGHT = 20
+PADDLE_MARGIN_X = 10
+PADDLE_MARGIN_Y = 30
 
 -- Runs when the game first starts up, only once; used to initialize the game
 function love.load()
   -- use nearest-neighbor (point) filtering on upscaling and downscaling to prevent blurring of text and 
   -- graphics instead of the bilinear filter that is applied by default 
   love.graphics.setDefaultFilter('nearest', 'nearest')
+  
+  -- use retro looking font
+  smallFont = love.graphics.newFont('assets/font.ttf', FONT_SIZE)
+  love.graphics.setFont(smallFont)
+  
   -- initialize virtual resolution, which will be rendered within the actual window no matter its
   -- dimensions; wraps the love.window.setMode call
   push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
@@ -36,11 +46,15 @@ function love.draw()
   -- begin rendering at virtual resolution (push works as a state machine, like OpenGL)
   push:apply('start')
   
-  love.graphics.printf('Hello Pong!',  
-    0,                                  -- starting X (0 since we're going to center it based on width)
-    VIRTUAL_HEIGHT / 2 - FONT_SIZE / 2, -- starting Y (halfway down the screen)
-    VIRTUAL_WIDTH,                      -- number of pixels to center within (the entire screen here)
-    'center')                           -- alignment mode, can be 'center', 'left', or 'right'
+  -- clear screen with a RGBA color
+  love.graphics.clear(40/255, 45/255, 52/255, 1)
+  
+  love.graphics.printf('Hello Pong!',  0, 20, VIRTUAL_WIDTH, 'center')
+  
+  -- the paddles and the ball will be represented by simple rectangles
+  love.graphics.rectangle('fill', PADDLE_MARGIN_X, PADDLE_MARGIN_Y, PADDLE_WIDTH, PADDLE_HEIGHT)
+  love.graphics.rectangle('fill', VIRTUAL_WIDTH - PADDLE_MARGIN_X, VIRTUAL_HEIGHT - PADDLE_HEIGHT - PADDLE_MARGIN_Y, PADDLE_WIDTH, PADDLE_HEIGHT)
+  love.graphics.rectangle('fill', VIRTUAL_WIDTH / 2 - BALL_SIZE / 2, VIRTUAL_HEIGHT / 2 - BALL_SIZE / 2, BALL_SIZE, BALL_SIZE)
   
   -- end rendering at virtual resolution
   push:apply('end')
