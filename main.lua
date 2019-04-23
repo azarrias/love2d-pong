@@ -4,6 +4,15 @@
 ]]
 push = require 'push'
 
+--[[ class is a library that simplifies OOP with lua, which is very useful here
+     https://github.com/vrld/hump/blob/master/class.lua
+]]
+Class = require 'class'
+
+-- the custom classes defined by using the class library must be imported as well
+require 'Paddle'
+require 'Ball'
+
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720 
 VIRTUAL_WIDTH = 432
@@ -40,11 +49,11 @@ function love.load()
   })
 
   -- initialize scores, paddle and ball positions
+  player1 = Paddle(PADDLE_MARGIN_X, PADDLE_MARGIN_Y, PADDLE_WIDTH, PADDLE_HEIGHT)
+  player2 = Paddle(VIRTUAL_WIDTH - PADDLE_MARGIN_X, VIRTUAL_HEIGHT - PADDLE_HEIGHT - PADDLE_MARGIN_Y, PADDLE_WIDTH, PADDLE_HEIGHT)
+  ball = Ball(VIRTUAL_WIDTH / 2 - BALL_SIZE / 2, VIRTUAL_HEIGHT / 2 - BALL_SIZE / 2, BALL_SIZE, BALL_SIZE)
   player1Score = 0
   player2Score = 0
-  player1Y = PADDLE_MARGIN_Y
-  player2Y = VIRTUAL_HEIGHT - PADDLE_HEIGHT - PADDLE_MARGIN_Y
-  initBall()
   
   -- initialize game FSM
   gameState = 'start'
@@ -59,40 +68,37 @@ function love.keypressed(key)
       gameState = 'play'
     else
       gameState = 'start'
-      initBall()
+      ball:reset()
     end
   end
-end
-
-function initBall()
-  ballX = VIRTUAL_WIDTH / 2 - BALL_SIZE / 2
-  ballY = VIRTUAL_HEIGHT / 2 - BALL_SIZE / 2
-  -- equivalent to ternary operator 
-  -- math.random(2) == 1 ? 100 : -100
-  ballDX = math.random(2) == 1 and 100 or -100
-  ballDY = math.random(-50, 50) * 1.5
 end
 
 -- Runs every frame
 function love.update(dt)
   -- player 1 movement (scaled by delta time)
   if love.keyboard.isDown('w') then
-    player1Y = math.max(0, player1Y + -PADDLE_SPEED * dt)
+    player1.dy = -PADDLE_SPEED
   elseif love.keyboard.isDown('s') then
-    player1Y = math.min(VIRTUAL_HEIGHT - PADDLE_HEIGHT, player1Y + PADDLE_SPEED * dt)
+    player1.dy = PADDLE_SPEED
+  else 
+    player1.dy = 0
   end
 
   -- player 2 movement (scaled by delta time)
   if love.keyboard.isDown('up') then
-    player2Y = math.max(0, player2Y + -PADDLE_SPEED * dt)
+    player2.dy = -PADDLE_SPEED
   elseif love.keyboard.isDown('down') then
-    player2Y = math.min(VIRTUAL_HEIGHT - PADDLE_HEIGHT, player2Y + PADDLE_SPEED * dt)
+    player2.dy = PADDLE_SPEED
+  else
+    player2.dy = 0
   end
   
   if gameState == 'play' then
-    ballX = ballX + ballDX * dt
-    ballY = ballY + ballDY * dt
+    ball:update(dt)
   end
+  
+  player1:update(dt)
+  player2:update(dt)
 end
 
 -- Called after update by LOVE2D, used to draw anything to the screen, updated or otherwise
@@ -104,15 +110,19 @@ function love.draw()
   love.graphics.clear(40/255, 45/255, 52/255, 1)
   
   love.graphics.setFont(smallFont)
-  love.graphics.printf('Hello Pong!',  0, 20, VIRTUAL_WIDTH, 'center')
+  if gameState == 'start' then
+    love.graphics.printf('Hello Start State!', 0, 20, VIRTUAL_WIDTH, 'center')
+  else
+    love.graphics.printf('Hello Play State!', 0, 20, VIRTUAL_WIDTH, 'center')
+  end
   
   -- draw the scores, paddles and ball
   love.graphics.setFont(bigFont)
   love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - FONT_SIZE_BIG / 2 - SCORE_MARGIN, VIRTUAL_HEIGHT / 3)
   love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + SCORE_MARGIN, VIRTUAL_HEIGHT / 3)
-  love.graphics.rectangle('fill', PADDLE_MARGIN_X, player1Y, PADDLE_WIDTH, PADDLE_HEIGHT)
-  love.graphics.rectangle('fill', VIRTUAL_WIDTH - PADDLE_MARGIN_X, player2Y, PADDLE_WIDTH, PADDLE_HEIGHT)
-  love.graphics.rectangle('fill', ballX, ballY, BALL_SIZE, BALL_SIZE)
+  player1:render()
+  player2:render()
+  ball:render()
   
   -- end rendering at virtual resolution
   push:apply('end')

@@ -1,0 +1,31 @@
+Ball = Class{}
+
+function Ball:init(x, y, width, height)
+  self.x = x
+  self.y = y
+  self.width = width
+  self.height = height
+  
+  -- equivalent to ternary operator 
+  -- math.random(2) == 1 ? 100 : -100
+  self.dx = math.random(2) == 1 and 100 or -100
+  self.dy = math.random(-50, 50) * 1.5
+end
+
+function Ball:reset()
+  self.x = VIRTUAL_WIDTH / 2 - BALL_SIZE / 2
+  self.y = VIRTUAL_HEIGHT / 2 - BALL_SIZE / 2
+  -- equivalent to ternary operator 
+  -- math.random(2) == 1 ? 100 : -100
+  self.dx = math.random(2) == 1 and 100 or -100
+  self.dy = math.random(-50, 50) * 1.5
+end
+
+function Ball:update(dt)
+  self.x = self.x + self.dx * dt
+  self.y = self.y + self.dy * dt
+end
+
+function Ball:render()
+  love.graphics.rectangle('fill', self.x, self.y, self.width, self.height)
+end
