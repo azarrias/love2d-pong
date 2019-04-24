@@ -26,12 +26,15 @@ PADDLE_MARGIN_X = 10
 PADDLE_MARGIN_Y = 30
 PADDLE_SPEED = 200
 SCORE_MARGIN = 30
+FPS_INDICATOR_MARGIN = 10
 
 -- Runs when the game first starts up, only once; used to initialize the game
 function love.load()
   -- use nearest-neighbor (point) filtering on upscaling and downscaling to prevent blurring of text and 
   -- graphics instead of the bilinear filter that is applied by default 
   love.graphics.setDefaultFilter('nearest', 'nearest')
+  
+  love.window.setTitle('Pong')
   
   -- use current time as seed to the RNG for true random behaviour, since that will vary on startup every time
   math.randomseed(os.time())
@@ -124,6 +127,15 @@ function love.draw()
   player2:render()
   ball:render()
   
+  displayFPS()
+  
   -- end rendering at virtual resolution
   push:apply('end')
+end
+
+function displayFPS()
+    -- simple FPS display across all states
+    love.graphics.setFont(smallFont)
+    love.graphics.setColor(0, 255, 0, 255)
+    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), FPS_INDICATOR_MARGIN, FPS_INDICATOR_MARGIN)
 end
