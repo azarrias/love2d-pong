@@ -97,6 +97,19 @@ function love.update(dt)
   end
   
   if gameState == 'play' then
+    if ball:collides(player1) or ball:collides(player2) then
+      ball.dx = -ball.dx * 1.03
+      -- instantly shift ball to prevent it from becoming stuck in the collision
+      shift_ball_x = ball.x < VIRTUAL_WIDTH / 2 and PADDLE_WIDTH or -PADDLE_WIDTH
+      ball.x = ball.x + shift_ball_x
+      
+      if ball.dy < 0 then
+        ball.dy = -math.random(10, 150)
+      else
+        ball.dy = math.random(10, 150)
+      end
+    end
+     
     ball:update(dt)
   end
   

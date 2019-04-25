@@ -21,6 +21,21 @@ function Ball:reset()
   self.dy = math.random(-50, 50) * 1.5
 end
 
+function Ball:collides(paddle)
+  -- left side of either is farther to the right than the right side of the other
+  if self.x > paddle.x + paddle.width or paddle.x > self.x + self.width then
+    return false
+  end
+  
+  -- bottom side of either is higher than the top side of the other
+  if self.y > paddle.y + paddle.height or paddle.y > self.y + self.height then
+    return false
+  end
+  
+  -- otherwise, they are overlapping
+  return true
+end  
+
 function Ball:update(dt)
   self.x = self.x + self.dx * dt
   self.y = self.y + self.dy * dt
