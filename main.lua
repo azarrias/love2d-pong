@@ -109,6 +109,15 @@ function love.update(dt)
         ball.dy = math.random(10, 150)
       end
     end
+    
+    -- detect upper and lower screen boundary collision and bounce if collided
+    if ball.y <= 0 then
+      ball.y = 0
+      ball.dy = -ball.dy
+    elseif ball.y >= VIRTUAL_HEIGHT - BALL_SIZE then
+      ball.y = VIRTUAL_HEIGHT - BALL_SIZE
+      ball.dy = -ball.dy
+    end
      
     ball:update(dt)
   end
