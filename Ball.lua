@@ -1,20 +1,15 @@
 Ball = Class{}
 
-function Ball:init(x, y, width, height)
-  self.x = x
-  self.y = y
+function Ball:init(width, height)
   self.width = width
   self.height = height
   
-  -- equivalent to ternary operator 
-  -- math.random(2) == 1 ? 100 : -100
-  self.dx = math.random(2) == 1 and 100 or -100
-  self.dy = math.random(-50, 50) * 1.5
+  self:reset()
 end
 
 function Ball:reset()
-  self.x = VIRTUAL_WIDTH / 2 - BALL_SIZE / 2
-  self.y = VIRTUAL_HEIGHT / 2 - BALL_SIZE / 2
+  self.x = VIRTUAL_WIDTH / 2 - self.width / 2
+  self.y = VIRTUAL_HEIGHT / 2 - self.height / 2
   -- equivalent to ternary operator 
   -- math.random(2) == 1 ? 100 : -100
   self.dx = math.random(2) == 1 and 100 or -100

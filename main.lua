@@ -54,9 +54,12 @@ function love.load()
   -- initialize scores, paddle and ball positions
   player1 = Paddle(PADDLE_MARGIN_X, PADDLE_MARGIN_Y, PADDLE_WIDTH, PADDLE_HEIGHT)
   player2 = Paddle(VIRTUAL_WIDTH - PADDLE_MARGIN_X, VIRTUAL_HEIGHT - PADDLE_HEIGHT - PADDLE_MARGIN_Y, PADDLE_WIDTH, PADDLE_HEIGHT)
-  ball = Ball(VIRTUAL_WIDTH / 2 - BALL_SIZE / 2, VIRTUAL_HEIGHT / 2 - BALL_SIZE / 2, BALL_SIZE, BALL_SIZE)
+  ball = Ball(BALL_SIZE, BALL_SIZE)
   player1Score = 0
   player2Score = 0
+  
+  -- randomize first service
+  servingPlayer = math.random(1, 2)
   
   -- initialize game FSM
   gameState = 'start'
@@ -68,10 +71,9 @@ function love.keypressed(key)
     love.event.quit()
   elseif key == 'enter' or key == 'return' then
     if gameState == 'start' then
+      gameState = 'serve'
+    elseif gameState == 'serve' then
       gameState = 'play'
-    else
-      gameState = 'start'
-      ball:reset()
     end
   end
 end
@@ -96,7 +98,15 @@ function love.update(dt)
     player2.dy = 0
   end
   
-  if gameState == 'play' then
+  if gameState == 'serve' then
+    -- initialize ball's velocity based on serving player
+    ball.dy = math.random(-50, 50)
+    if servingPlayer == 1 then
+      ball.dx = math.random(140, 200)
+    else
+      ball.dx = -math.random(140, 200)
+    end
+  elseif gameState == 'play' then
     if ball:collides(player1) or ball:collides(player2) then
       ball.dx = -ball.dx * 1.03
       -- instantly shift ball to prevent it from becoming stuck in the collision
@@ -121,13 +131,15 @@ function love.update(dt)
     
     -- check if a goal has been scored
     if ball.x + BALL_SIZE < 0 then
+      servingPlayer = 1
       player2Score = player2Score + 1
       ball:reset()
-      gameState = 'start'
+      gameState = 'serve'
     elseif ball.x > VIRTUAL_WIDTH then
+      servingPlayer = 2
       player1Score = player1Score + 1
       ball:reset()
-      gameState = 'start'
+      gameState = 'serve'
     end
      
   end
@@ -148,17 +160,10 @@ function love.draw()
   -- clear screen with a RGBA color
   love.graphics.clear(40/255, 45/255, 52/255, 1)
   
-  love.graphics.setFont(smallFont)
-  if gameState == 'start' then
-    love.graphics.printf('Hello Start State!', 0, 20, VIRTUAL_WIDTH, 'center')
-  else
-    love.graphics.printf('Hello Play State!', 0, 20, VIRTUAL_WIDTH, 'center')
-  end
+  displayScore()
+  displayFeedback()
   
-  -- draw the scores, paddles and ball
-  love.graphics.setFont(bigFont)
-  love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - FONT_SIZE_BIG / 2 - SCORE_MARGIN, VIRTUAL_HEIGHT / 3)
-  love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + SCORE_MARGIN, VIRTUAL_HEIGHT / 3)
+  -- draw the players paddles and the ball
   player1:render()
   player2:render()
   ball:render()
@@ -174,4 +179,22 @@ function displayFPS()
     love.graphics.setFont(smallFont)
     love.graphics.setColor(0, 255, 0, 255)
     love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), FPS_INDICATOR_MARGIN, FPS_INDICATOR_MARGIN)
+end
+
+function displayScore()
+  love.graphics.setFont(bigFont)
+  love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - FONT_SIZE_BIG / 2 - SCORE_MARGIN, VIRTUAL_HEIGHT / 3)
+  love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + SCORE_MARGIN, VIRTUAL_HEIGHT / 3)
+end
+
+function displayFeedback()
+  love.graphics.setFont(smallFont)
+  if gameState == 'start' then
+    love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Press Enter to begin!', 0, 20, VIRTUAL_WIDTH, 'center')
+  elseif gameState == 'serve' then
+    love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!",
+      0, 10, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Press Enter to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
+  end
 end
