@@ -18,6 +18,7 @@ WINDOW_HEIGHT = 720
 VIRTUAL_WIDTH = 432
 VIRTUAL_HEIGHT = 243
 FONT_SIZE_SMALL = 8
+FONT_SIZE_MEDIUM = 16
 FONT_SIZE_BIG = 32
 BALL_SIZE = 4
 PADDLE_WIDTH = 5
@@ -42,6 +43,7 @@ function love.load()
   -- use retro looking font
   smallFont = love.graphics.newFont('assets/font.ttf', FONT_SIZE_SMALL)
   bigFont = love.graphics.newFont('assets/font.ttf', FONT_SIZE_BIG)
+  mediumFont = love.graphics.newFont('assets/font.ttf', FONT_SIZE_MEDIUM)
   
   -- initialize virtual resolution, which will be rendered within the actual window no matter its
   -- dimensions; wraps the love.window.setMode call
@@ -74,6 +76,11 @@ function love.keypressed(key)
       gameState = 'serve'
     elseif gameState == 'serve' then
       gameState = 'play'
+    elseif gameState == 'done' then
+      gameState = 'serve'
+      ball:reset()
+      player1Score = 0
+      player2Score = 0
     end
   end
 end
@@ -133,13 +140,24 @@ function love.update(dt)
     if ball.x + BALL_SIZE < 0 then
       servingPlayer = 1
       player2Score = player2Score + 1
-      ball:reset()
-      gameState = 'serve'
+      -- check for game over (losing player will serve first in next game)
+      if player2Score == 10 then
+        winningPlayer = 2
+        gameState = 'done'
+      else
+        ball:reset()
+        gameState = 'serve'
+      end
     elseif ball.x > VIRTUAL_WIDTH then
       servingPlayer = 2
       player1Score = player1Score + 1
-      ball:reset()
-      gameState = 'serve'
+      if player1Score == 10 then
+        winningPlayer = 1
+        gameState = 'done'
+      else
+        ball:reset()
+        gameState = 'serve'
+      end
     end
      
   end
@@ -196,5 +214,9 @@ function displayFeedback()
     love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!",
       0, 10, VIRTUAL_WIDTH, 'center')
     love.graphics.printf('Press Enter to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
+  elseif gameState == 'done' then
+    love.graphics.printf('Press Enter to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
+    love.graphics.setFont(mediumFont)
+    love.graphics.printf('Player ' .. tostring(winningPlayer) .. ' wins!', 0, 10, VIRTUAL_WIDTH, 'center')
   end
 end
