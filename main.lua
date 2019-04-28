@@ -45,6 +45,14 @@ function love.load()
   bigFont = love.graphics.newFont('assets/font.ttf', FONT_SIZE_BIG)
   mediumFont = love.graphics.newFont('assets/font.ttf', FONT_SIZE_MEDIUM)
   
+  -- set up table with all sound effects
+  -- type is static because they are short FXs to be kept in memory
+  sounds = {
+    ['paddle_hit'] = love.audio.newSource('assets/paddle_hit.wav', 'static'),
+    ['score'] = love.audio.newSource('assets/score.wav', 'static'),
+    ['wall_hit'] = love.audio.newSource('assets/wall_hit.wav', 'static')
+  }
+  
   -- initialize virtual resolution, which will be rendered within the actual window no matter its
   -- dimensions; wraps the love.window.setMode call
   push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
@@ -125,21 +133,26 @@ function love.update(dt)
       else
         ball.dy = math.random(10, 150)
       end
+      
+      sounds['paddle_hit']:play()
     end
     
     -- detect upper and lower screen boundary collision and bounce if collided
     if ball.y <= 0 then
       ball.y = 0
       ball.dy = -ball.dy
+      sounds['wall_hit']:play()
     elseif ball.y >= VIRTUAL_HEIGHT - BALL_SIZE then
       ball.y = VIRTUAL_HEIGHT - BALL_SIZE
       ball.dy = -ball.dy
+      sounds['wall_hit']:play()
     end
     
     -- check if a goal has been scored
     if ball.x + BALL_SIZE < 0 then
       servingPlayer = 1
       player2Score = player2Score + 1
+      sounds['score']:play()
       -- check for game over (losing player will serve first in next game)
       if player2Score == 10 then
         winningPlayer = 2
@@ -151,6 +164,7 @@ function love.update(dt)
     elseif ball.x > VIRTUAL_WIDTH then
       servingPlayer = 2
       player1Score = player1Score + 1
+      sounds['score']:play()
       if player1Score == 10 then
         winningPlayer = 1
         gameState = 'done'
