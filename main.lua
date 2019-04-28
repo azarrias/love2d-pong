@@ -57,7 +57,7 @@ function love.load()
   -- dimensions; wraps the love.window.setMode call
   push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
     fullscreen = false,
-    resizable = false,
+    resizable = true,
     vsync = true
   })
 
@@ -91,6 +91,11 @@ function love.keypressed(key)
       player2Score = 0
     end
   end
+end
+
+-- Called by LOVE2D whenever screed is resized
+function love.resize(w, h)
+  push:resize(w, h)
 end
 
 -- Runs every frame
@@ -200,7 +205,7 @@ function love.draw()
   player2:render()
   ball:render()
   
-  displayFPS()
+--  displayFPS()
   
   -- end rendering at virtual resolution
   push:apply('end')
