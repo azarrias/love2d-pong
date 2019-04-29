@@ -2,12 +2,12 @@
      window is; used to provide a more retro aesthetic
      https://github.com/Ulydev/push
 ]]
-push = require 'push'
+push = require 'libs.push'
 
 --[[ class is a library that simplifies OOP with lua, which is very useful here
      https://github.com/vrld/hump/blob/master/class.lua
 ]]
-Class = require 'class'
+Class = require 'libs.class'
 
 -- the custom classes defined by using the class library must be imported as well
 require 'Paddle'
