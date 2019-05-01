@@ -1,0 +1,29 @@
+language: bash
+sudo: false
+install: true
+addons:
+  apt:
+    packages:
+    - lua5.1
+    - python2.7
+  
+script: "[[ -n $TRAVIS_TAG ]] && ./build.sh web || ./build.sh" # web only for tags
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    # travis encrypt <token> 
+  secure: cfET/I6qwtYOiM1lhk/EgwTmmkcS2p/KtZHQl88wNIkv9gfn1ZfxONXrz+zZBcTCwg7j0qRjXqWT9HcuBes0HUMQekYzD+bXr2a3xMCM29ID7MwDG7YfOKhaTZnHCJZwxvjouaZzl3brDheL8wzR4PSQPljm5xegNXalA1w9DFkc2PsOoVVePuBI5+IuJYdp2P5d19XNcRzBgmmCL50tl3+Qk9gQWzNdOAdwnBDKxvKOIacp2/9bSS+UaUVR5FSRoveiJruz5VbBJsCZXoP7ISKPtNL1UBGHVIidGQQxSGOlGcrurKqTDtdmGLagRlHKDRvCGkcymc5KEPI0T1nGOfDksMZLnWyQheB6iv0vd3/Ok9CzyiJemXC/w5PoyhkiA26YdeYu+5o7kxGmZaw8WRwAFUTREJw1yxW/78cKPUtVcHQC26vxYsgQ2SbScQZq6yrgKztc8yvIPBuS+nq0GTNSsqgY/lBlXYnWVlM8EfXnigfe3WAqsOOtr6CZG51aoJz0weWEGrEXAc+9qLh+ssKluzT1ZGmTFDe8j+s3goNfiue4cddvEMRPdcbPKy44IcPHUhmdIS3Et6nPrlx0vFXiRtmxh7NK7iA7mFvTLOFBfZd82ad7Ql9nV4QM2zy67kwB2FtXVMhWvH6bbo3E33RlaITg2/6Ogp8XIHyGmVc=
+  file:
+  - target/pong.love
+  - target/pong-win.zip
+  - target/pong-web.zip
+  on:
+    tags: true
+    all_branches: true
+after_success:
+- "[[ -n $TRAVIS_TAG ]] && ./build.sh deploy $TRAVIS_REPO_SLUG"
+env:
+  global:
+   # travis encrypt GH_TOKEN=<token>
+  - secure: GSvLbHt8J4wJux2hM/K0wokEvK7j69ml/G42OYwb/uE18VfNHEKSAlmoUVO5C73yb5E68aSbkYGlVt6HLpFoyEOy0QM3eA9DYDI5NHG5X+eFfQCVOJE0HVG6Fxp5vVYxcR7go0Dep37lt6486UmNv9IUmIzrJGUHPxneNq3LG86/YNwGMZ8gZ+FQvNBUjQRp3zOJwmgynuSyIRQmhd2lg+ukFysTIpDW6L3+7wg3geh+CAOBJslFYTIDnXcwyGdPV7+hgqokkL+bCJoxtRIlYcjUg510XX/wgPzhJfA+XrmFGIHwkN/GAz9MKEKPKDJRO2ju+v9k56Ly1gJzLuTRDmgpmXyINmlwtxms5+Xrb/7Htyb9gOAXKLBbNsNjen6cZL82n/FiyEbBy+SSpQ2mp3EUdjM5czI9OrVEtZPhbutBKnkPjTRLB2VaXhOJX8gp4Oxe+Il2UQLhwYFpYnEZ1LHS7RsJQ3GWaoM2PJvp257hwf2/eiNnj0g/uSc5TxCLW9uteC1AmUVZkcrmCzSi8TapdrWPKNOj6Aqohx5r84iefJHMc0p3bjnRct+KWGBJw8l/tA4kPE3XbmvC84uyjuvvb9d4U78bG2dhZYDKiU4B5jip+o9RWAQrGFuNJqn+8PXLKNiLbie03wopI4v5JF0Iif1dZuXpPE5+J859i48=

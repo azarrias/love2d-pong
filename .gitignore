@@ -87,5 +87,5 @@ $RECYCLE.BIN/
 # End of https://www.gitignore.io/api/lua,linux,windows
 
 # Build directories
-[Bb]in
-[Bb]uild*
+[Bb]in/
+[Bb]uild*/
