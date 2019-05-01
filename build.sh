@@ -61,8 +61,8 @@ unzip -o "target/love-win.zip" -d "target"
 
 tmp="target/tmp/"
 mkdir -p "$tmp/$P"
-cat "target/love-${LV}-win32/love.exe" "target/${P}.love" > "$tmp/${P}/${P}.exe"
-cp  target/love-"${LV}"-win32/*dll target/love-"${LV}"-win32/license* "$tmp/$P"
+cat "target/love-${LV}*-win32/love.exe" "target/${P}.love" > "$tmp/${P}/${P}.exe"
+cp  target/love-"${LV}"*-win32/*dll target/love-"${LV}"*-win32/license* "$tmp/$P"
 cd "$tmp"
 zip -9 -r - "$P" > "${P}-win.zip"
 cd -
