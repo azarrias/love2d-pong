@@ -28,9 +28,40 @@ PADDLE_MARGIN_Y = 30
 PADDLE_SPEED = 200
 SCORE_MARGIN = 30
 FPS_INDICATOR_MARGIN = 10
+LOVE_VERSION_GT0 = love._version_major > 0
+
+-- Wrapper functions to handle differences across love2d versions
+local setColor = function(r, g, b, a)
+  if not r or not g or not b or 
+    not tonumber(r) or not tonumber(g) or not tonumber(b) 
+    or a and not tonumber(a) then
+    error("bad argument to 'setColor' (number expected)")
+  end
+  a = a or 255
+  if LOVE_VERSION_GT0 then
+    love.graphics.setColor(r/255, g/255, b/255, a/255)
+  else
+    love.graphics.setColor(r, g, b, a)
+  end
+end
+
+local clear = function(r, g, b, a, clearstencil, cleardepth)
+  if not r or not g or not b or 
+    not tonumber(r) or not tonumber(g) or not tonumber(b) 
+    or a and not tonumber(a) then
+    error("bad argument to 'clear' (number expected)")
+  end
+  a, clearstencil, cleardepth = a or 255, clearstencil or true, cleardepth or true
+  if LOVE_VERSION_GT0 then
+    love.graphics.clear(r/255, g/255, b/255, a/255, clearstencil, cleardepth)
+  else
+    love.graphics.clear(r, g, b, a)
+  end
+end
 
 -- Runs when the game first starts up, only once; used to initialize the game
 function love.load()
+  if arg[#arg] == "-debug" then require("mobdebug").start() end
   -- use nearest-neighbor (point) filtering on upscaling and downscaling to prevent blurring of text and 
   -- graphics instead of the bilinear filter that is applied by default 
   love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -195,7 +226,7 @@ function love.draw()
   push:apply('start')
   
   -- clear screen with a RGBA color
-  love.graphics.clear(40/255, 45/255, 52/255, 1)
+  clear(40, 45, 52, 255)
   
   displayScore()
   displayFeedback()
@@ -205,7 +236,7 @@ function love.draw()
   player2:render()
   ball:render()
   
---  displayFPS()
+  displayFPS()
   
   -- end rendering at virtual resolution
   push:apply('end')
@@ -214,7 +245,7 @@ end
 function displayFPS()
     -- simple FPS display across all states
     love.graphics.setFont(smallFont)
-    love.graphics.setColor(0, 255, 0, 255)
+    setColor(0, 255, 0, 255)
     love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), FPS_INDICATOR_MARGIN, FPS_INDICATOR_MARGIN)
 end
 

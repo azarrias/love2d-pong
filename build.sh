@@ -4,7 +4,7 @@ set -x
 
 P="pong"
 
-LV="11.2"
+LV="0.10.2"
 LZ="https://bitbucket.org/rude/love/downloads/love-${LV}-win32.zip"
 
 
