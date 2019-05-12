@@ -28,7 +28,7 @@ PADDLE_MARGIN_Y = 30
 PADDLE_SPEED = 200
 SCORE_MARGIN = 30
 FPS_INDICATOR_MARGIN = 10
-LOVE_VERSION_GT0 = love._version_major > 0
+NEW_COLOR_RANGE = love._version_major > 0 or love._version_major == 0 and love._version_minor >= 11
 
 -- Wrapper functions to handle differences across love2d versions
 local setColor = function(r, g, b, a)
@@ -38,7 +38,7 @@ local setColor = function(r, g, b, a)
     error("bad argument to 'setColor' (number expected)")
   end
   a = a or 255
-  if LOVE_VERSION_GT0 then
+  if NEW_COLOR_RANGE then
     love.graphics.setColor(r/255, g/255, b/255, a/255)
   else
     love.graphics.setColor(r, g, b, a)
@@ -52,7 +52,7 @@ local clear = function(r, g, b, a, clearstencil, cleardepth)
     error("bad argument to 'clear' (number expected)")
   end
   a, clearstencil, cleardepth = a or 255, clearstencil or true, cleardepth or true
-  if LOVE_VERSION_GT0 then
+  if NEW_COLOR_RANGE then
     love.graphics.clear(r/255, g/255, b/255, a/255, clearstencil, cleardepth)
   else
     love.graphics.clear(r, g, b, a)
