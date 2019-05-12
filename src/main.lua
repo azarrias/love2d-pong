@@ -236,7 +236,7 @@ function love.draw()
   player2:render()
   ball:render()
   
-  displayFPS()
+--  displayFPS()
   
   -- end rendering at virtual resolution
   push:apply('end')
