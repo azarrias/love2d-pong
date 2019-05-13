@@ -5,8 +5,10 @@
 -- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-local love11 = love.getVersion() == 11
+-- Workaround to support love.js 0.11.0-rc3 which is a pre-release of v11
+--local love11 = love.getVersion() == 11
 --local getDPI = love11 and love.window.getDPIScale or love.window.getPixelScale
+local love11 = love._version_major == 11 or love._version_major == 0 and love._version_minor == 11
 local getDPI = love11 and love.window.getDPIScale or love.window.getPixelScale or function()
   return 1
 end
